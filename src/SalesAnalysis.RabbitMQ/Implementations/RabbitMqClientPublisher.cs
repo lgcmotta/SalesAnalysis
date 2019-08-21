@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Polly;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using SalesAnalysis.FileWatcher.Core.Domain;
-using SalesAnalysis.FileWatcher.Core.RabbitMQ;
+using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWatcher.Application.RabbitMQ
+namespace SalesAnalysis.RabbitMQ.Implementations
 {
     public class RabbitMqClientPublisher : IRabbitMqClientPublisher
     {
@@ -25,26 +19,17 @@ namespace SalesAnalysis.FileWatcher.Application.RabbitMQ
         }
 
 
-        public async Task PublishAsync(IConfiguration configuration, InputFile file)
+        public async Task PublishAsync(IConfiguration configuration, object file)
         {
             lock (_syncroot)
             {
                 var retryCount = int.Parse(configuration["RabbitMqRetryCount"]);
 
-                var policy = Policy.Handle<SocketException>().Or<BrokerUnreachableException>().WaitAndRetry(retryCount
-                    , retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
-                    , (ex, time) =>
-                    {
-                        _logger.LogWarning(ex, "RabbitMQ Client could not connect atver {TimeOut}s ({ExceptionMessage})"
-                            , $"{time.TotalSeconds:n1}", ex.Message);
-                    });
+                var policy = PolicyHelper.CreatePolicy(_logger,retryCount);
 
                 policy.Execute(() =>
                 {
-                    var factory = new ConnectionFactory {HostName = configuration["RabbitMqHostName"]
-                        ,UserName = configuration["RabbitMqUsername"]
-                        ,Password = configuration["RabbitMqPassword"]
-                    };
+                    var factory = RabbitMqHelper.CreateConnectionFactory(configuration);
 
                     using var connection = factory.CreateConnection();
 
@@ -62,9 +47,7 @@ namespace SalesAnalysis.FileWatcher.Application.RabbitMQ
                         , configuration["RabbitMqQueueName"]
                         , null
                         , body);
-
                 });
-
             }
         }
     }

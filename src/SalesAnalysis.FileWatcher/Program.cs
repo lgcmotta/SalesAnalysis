@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -8,15 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RabbitMQ.Client.Exceptions;
-using SalesAnalysis.FileWatcher.Application.RabbitMQ;
 using SalesAnalysis.FileWatcher.Application.Scanner;
 using SalesAnalysis.FileWatcher.Application.Worker;
-using SalesAnalysis.FileWatcher.Core.RabbitMQ;
 using SalesAnalysis.FileWatcher.Core.Scanner;
 using SalesAnalysis.FileWatcher.Infrastructure.Migrations;
 using SalesAnalysis.FileWatcher.Infrastructure.Persitence;
 using SalesAnalysis.FileWatcher.Infrastructure.Registrations;
+using SalesAnalysis.RabbitMQ.Implementations;
+using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.ServicesConfiguration.Configurations;
 
 namespace SalesAnalysis.FileWatcher

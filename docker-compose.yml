@@ -31,3 +31,17 @@ services:
     depends_on:
       - sqlserver
       - rabbitmq
+
+  salesanalysis.salesprocessor:
+    image: ${DOCKER_REGISTRY-}salesanalysissalesprocessor
+    build:
+      context: .
+      dockerfile: src/SalesAnalysis.SalesProcessor/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    volumes:
+      - C:/HOMEPATH/data/in:/var/lib/HOMEPATH/data/in
+      - C:/HOMEPATH/data/out:/var/lib/HOMEPATH/data/out
+    depends_on:
+      - sqlserver
+      - rabbitmq

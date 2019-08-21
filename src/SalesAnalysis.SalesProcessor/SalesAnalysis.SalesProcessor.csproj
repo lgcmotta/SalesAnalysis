@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <UserSecretsId>dotnet-SalesAnalysis.FileWatcher-6929930F-F4E8-450A-9D75-EA7F1E8B969B</UserSecretsId>
+    <UserSecretsId>dotnet-SalesAnalysis.SalesProcessor-233B69F8-1B7E-4D7C-8BDA-627281049EA9</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
@@ -18,18 +18,18 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0-preview6.19304.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.12" />
     <PackageReference Include="Polly" Version="7.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\Domain\" />
+    <Folder Include="Infrastructure\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SalesAnalysis.RabbitMQ\SalesAnalysis.RabbitMQ.csproj" />
     <ProjectReference Include="..\SalesAnalysis.ServicesConfiguration\SalesAnalysis.ServicesConfiguration.csproj" />
     <ProjectReference Include="..\SalesAnalysis.UnitOfWork\SalesAnalysis.UnitOfWork.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

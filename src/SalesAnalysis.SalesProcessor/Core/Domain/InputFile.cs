@@ -1,7 +1,7 @@
 ﻿using System;
 using SalesAnalysis.UnitOfWork.Abstractions;
 
-namespace SalesAnalysis.FileWatcher.Core.Domain
+namespace SalesAnalysis.SalesProcessor.Core.Domain
 {
     public class InputFile : IEntity
     {

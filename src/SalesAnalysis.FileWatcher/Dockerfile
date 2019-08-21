@@ -6,6 +6,7 @@ WORKDIR /src
 COPY ["src/SalesAnalysis.FileWatcher/SalesAnalysis.FileWatcher.csproj", "src/SalesAnalysis.FileWatcher/"]
 COPY ["src/SalesAnalysis.UnitOfWork/SalesAnalysis.UnitOfWork.csproj", "src/SalesAnalysis.UnitOfWork/"]
 COPY ["src/SalesAnalysis.ServicesConfiguration/SalesAnalysis.ServicesConfiguration.csproj", "src/SalesAnalysis.ServicesConfiguration/"]
+COPY ["src/SalesAnalysis.ServicesConfiguration/SalesAnalysis.RabbitMQ.csproj", "src/SalesAnalysis.RabbitMQ/"]
 RUN dotnet restore "src/SalesAnalysis.FileWatcher/SalesAnalysis.FileWatcher.csproj"
 COPY . .
 WORKDIR "/src/src/SalesAnalysis.FileWatcher"
