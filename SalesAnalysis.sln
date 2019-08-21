@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.62
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A71FB2B1-D130-487C-B094-970D724DA41F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileWatcher", "FileWatcher", "{5BE1D713-65B6-49AE-B424-8AA239094DA3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{DDB887FB-918A-44DE-BA93-2C40ED1FC378}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SalesProcessor", "SalesProcessor", "{7DA5810E-18A0-4AD2-B6D7-D9FBF54DCC6E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileWriter", "FileWriter", "{A564F915-B828-47C6-9C05-A29B9D95A186}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesAnalysis.FileWatcher", "src\SalesAnalysis.FileWatcher\SalesAnalysis.FileWatcher.csproj", "{7599DA73-1395-4B9B-AB91-3C1233BCCEAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesAnalysis.UnitOfWork", "src\SalesAnalysis.UnitOfWork\SalesAnalysis.UnitOfWork.csproj", "{FE176E15-4EB9-46E7-9B0F-625E200AD2B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesAnalysis.ServicesConfiguration", "src\SalesAnalysis.ServicesConfiguration\SalesAnalysis.ServicesConfiguration.csproj", "{82AB386A-0C7A-4E74-B1EA-CF8446962D90}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{52B224C3-FA56-4919-9CDC-2651310E06E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7599DA73-1395-4B9B-AB91-3C1233BCCEAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7599DA73-1395-4B9B-AB91-3C1233BCCEAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7599DA73-1395-4B9B-AB91-3C1233BCCEAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7599DA73-1395-4B9B-AB91-3C1233BCCEAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE176E15-4EB9-46E7-9B0F-625E200AD2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE176E15-4EB9-46E7-9B0F-625E200AD2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE176E15-4EB9-46E7-9B0F-625E200AD2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE176E15-4EB9-46E7-9B0F-625E200AD2B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82AB386A-0C7A-4E74-B1EA-CF8446962D90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82AB386A-0C7A-4E74-B1EA-CF8446962D90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82AB386A-0C7A-4E74-B1EA-CF8446962D90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82AB386A-0C7A-4E74-B1EA-CF8446962D90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52B224C3-FA56-4919-9CDC-2651310E06E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52B224C3-FA56-4919-9CDC-2651310E06E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52B224C3-FA56-4919-9CDC-2651310E06E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52B224C3-FA56-4919-9CDC-2651310E06E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5BE1D713-65B6-49AE-B424-8AA239094DA3} = {A71FB2B1-D130-487C-B094-970D724DA41F}
+		{DDB887FB-918A-44DE-BA93-2C40ED1FC378} = {A71FB2B1-D130-487C-B094-970D724DA41F}
+		{7DA5810E-18A0-4AD2-B6D7-D9FBF54DCC6E} = {A71FB2B1-D130-487C-B094-970D724DA41F}
+		{A564F915-B828-47C6-9C05-A29B9D95A186} = {A71FB2B1-D130-487C-B094-970D724DA41F}
+		{7599DA73-1395-4B9B-AB91-3C1233BCCEAE} = {5BE1D713-65B6-49AE-B424-8AA239094DA3}
+		{FE176E15-4EB9-46E7-9B0F-625E200AD2B2} = {DDB887FB-918A-44DE-BA93-2C40ED1FC378}
+		{82AB386A-0C7A-4E74-B1EA-CF8446962D90} = {DDB887FB-918A-44DE-BA93-2C40ED1FC378}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA3445B3-3617-469A-ADC5-63598FA4B02C}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+
+  sqlserver:
+    image: microsoft/mssql-server-linux:2017-latest
+    environment:
+      - SA_PASSWORD=aBcD*1!234
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=salesanalysisusr
+      - RABBITMQ_DEFAULT_PASS=salesanalysispass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  salesanalysis.filewatcher:
+    image: ${DOCKER_REGISTRY-}salesanalysisfilewatcher
+    build:
+      context: .
+      dockerfile: src/SalesAnalysis.FileWatcher/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    volumes:
+      - C:/HOMEPATH/data/in:/var/lib/HOMEPATH/data/in
+    depends_on:
+      - sqlserver
+      - rabbitmq
