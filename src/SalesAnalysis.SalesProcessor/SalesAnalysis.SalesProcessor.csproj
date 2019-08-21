@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Domain\" />
-    <Folder Include="Infrastructure\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SalesAnalysis.RabbitMQ\SalesAnalysis.RabbitMQ.csproj" />
     <ProjectReference Include="..\SalesAnalysis.ServicesConfiguration\SalesAnalysis.ServicesConfiguration.csproj" />
     <ProjectReference Include="..\SalesAnalysis.UnitOfWork\SalesAnalysis.UnitOfWork.csproj" />

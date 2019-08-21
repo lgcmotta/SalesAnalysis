@@ -16,5 +16,8 @@ namespace SalesAnalysis.SalesProcessor.Core.Domain
         public bool Processed { get; set; }
 
         public DateTime ProcessDate { get; set; }
+
+        public bool Canceled { get; set; }
+        
     }
 }

@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using SalesAnalysis.RabbitMQ.EventArgs;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
 namespace SalesAnalysis.RabbitMQ.Implementations
@@ -10,43 +13,58 @@ namespace SalesAnalysis.RabbitMQ.Implementations
     public class RabbitMqClientReceiver : IRabbitMqClientReceiver
     {
         private readonly ILogger<RabbitMqClientReceiver> _logger;
+        private readonly ConnectionFactory _connectionFactory;
+        private readonly IConfiguration _configuration;
 
-        public RabbitMqClientReceiver(ILogger<RabbitMqClientReceiver> logger)
+        private IConnection _connection;
+        private IModel _channel;
+        private EventingBasicConsumer _consumer;
+
+        public event EventHandler Receive;
+
+
+        public RabbitMqClientReceiver(ILogger<RabbitMqClientReceiver> logger, ConnectionFactory connectionFactory, IConfiguration configuration)
         {
             _logger = logger;
+            _connectionFactory = connectionFactory;
+            _configuration = configuration;
         }
 
-        public async Task ConfigureChannel(IConfiguration configuration)
+        public async Task ConfigureChannel()
         {
-            var retryCount = int.Parse(configuration["RabbitMqRetryCount"]);
+            var retryCount = int.Parse(_configuration["RabbitMqRetryCount"]);
 
             var policy = PolicyHelper.CreatePolicy(_logger, retryCount);
 
             policy.Execute(() =>
             {
-                var factory = RabbitMqHelper.CreateConnectionFactory(configuration);
+                _connection = _connectionFactory.CreateConnection();
 
-                using var connection = factory.CreateConnection();
+                _channel = _connection.CreateModel();
 
-                using var channel = connection.CreateModel();
-
-                channel.QueueDeclare(configuration["RabbitMqQueueName"]
+                _channel.QueueDeclare(_configuration["RabbitMqQueueName"]
                     , false
                     , false
                     , false
                     , null);
 
-                var consumer = new EventingBasicConsumer(channel);
+                _consumer = new EventingBasicConsumer(_channel);
 
-                consumer.Received += OnConsumerOnReceived;
+                _consumer.Received += OnConsumerOnReceived;
 
-                var consumeTag = channel.BasicConsume(configuration["RabbitMqQueueName"], true, consumer);
+                _channel.BasicConsume(_configuration["RabbitMqQueueName"], true, _consumer);
             });
         }
 
+        
+        public void OnReceived(object sender)
+        {
+            Receive?.Invoke(sender,System.EventArgs.Empty);
+        }
+        
         private void OnConsumerOnReceived(object sender, BasicDeliverEventArgs args)
         {
-            var body = args.Body;
+            OnReceived(args.Body);
         }
     }
 }
