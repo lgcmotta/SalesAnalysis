@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SalesAnalysis.FileWatcher.Core.Scanner;
+using SalesAnalysis.FileWatcher.Core.Interfaces;
 
-namespace SalesAnalysis.FileWatcher.Application.Worker
+namespace SalesAnalysis.FileWatcher.Application.WorkerService
 {
     public class Worker : BackgroundService
     {

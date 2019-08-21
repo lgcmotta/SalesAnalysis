@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.SalesProcessor.Core.Domain;
-using SalesAnalysis.SalesProcessor.Core.Processors;
+using SalesAnalysis.SalesProcessor.Core.Interfaces;
 
-namespace SalesAnalysis.SalesProcessor.Application.Worker
+namespace SalesAnalysis.SalesProcessor.Application.WorkerService
 {
     public class Worker : BackgroundService
     {
@@ -19,7 +19,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Worker
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IConfiguration _configuration;
         private static IRabbitMqClientReceiver _clientReceiver;
-        private static ISalesProcessor _salesProcessor;
+        private static ISalesFileAnalyser _salesFileAnalyser;
         
         public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
         {
@@ -33,7 +33,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Worker
             var createScope = _serviceScopeFactory.CreateScope();
 
             _clientReceiver = createScope.ServiceProvider.GetRequiredService<IRabbitMqClientReceiver>();
-            _salesProcessor = createScope.ServiceProvider.GetRequiredService<ISalesProcessor>();
+            _salesFileAnalyser = createScope.ServiceProvider.GetRequiredService<ISalesFileAnalyser>();
             await _clientReceiver.ConfigureChannel();
 
             _clientReceiver.Receive += RabbitMqClientOnRecieve;
@@ -44,7 +44,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Worker
             //var file = JsonConvert.DeserializeObject<InputFile>(Encoding.GetEncoding("iso-8859-1").GetString(sender as byte[]));
             var file = JsonConvert.DeserializeObject<InputFile>(Encoding.UTF8.GetString(sender as byte[]));
 
-            _salesProcessor.ProcessInputFile(file).GetAwaiter();
+            _salesFileAnalyser.ProcessInputFile(file).GetAwaiter();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

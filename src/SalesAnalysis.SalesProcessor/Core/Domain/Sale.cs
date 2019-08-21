@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SalesAnalysis.UnitOfWork.Abstractions;
 
 namespace SalesAnalysis.SalesProcessor.Core.Domain

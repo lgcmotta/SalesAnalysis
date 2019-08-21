@@ -5,25 +5,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SalesAnalysis.SalesProcessor.Application.DTO;
 using SalesAnalysis.SalesProcessor.Core.Domain;
-using SalesAnalysis.SalesProcessor.Core.Processors;
-using SalesAnalysis.SalesProcessor.Core.ViewModel;
+using SalesAnalysis.SalesProcessor.Core.Interfaces;
 
-namespace SalesAnalysis.SalesProcessor.Application.Processors
+namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 {
-    public class SaleProcessor : ISalesProcessor
+    public class SalesFileAnalyzer : ISalesFileAnalyser
     {
-        private readonly ILogger<SaleProcessor> _logger;
+        private readonly ILogger<SalesFileAnalyzer> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IDbProcessor _dbProcessor;
+        private readonly ISalesDataProcessor _salesDataProcessor;
 
-        public SaleProcessor(ILogger<SaleProcessor> logger, IConfiguration configuration, IDbProcessor dbProcessor)
+        public SalesFileAnalyzer(ILogger<SalesFileAnalyzer> logger, IConfiguration configuration, ISalesDataProcessor salesDataProcessor)
         {
             _logger = logger;
             _configuration = configuration;
-            _dbProcessor = dbProcessor;
+            _salesDataProcessor = salesDataProcessor;
         }
 
         public async Task ProcessInputFile(InputFile inputFile)
@@ -37,7 +36,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
 
                 var fileContent = await File.ReadAllLinesAsync(fullPath, CancellationToken.None);
 
-                var viewModel = new FileContentViewModel {InputFile = inputFile};
+                var viewModel = new FileContentDto {InputFile = inputFile};
 
                 viewModel.InputFile.Processed = true;
                 viewModel.InputFile.Canceled = false;
@@ -53,16 +52,18 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
                         AddSale(line, viewModel);
                 }
 
-                await _dbProcessor.ProcessDatabaseViewModel(viewModel);
+                await _salesDataProcessor.SaveContentToDatabase(viewModel);
 
             }
             catch (Exception exception)
             {
-                
+                _logger.LogCritical("An unexpected exception occurred when processing input file {FileName}", inputFile.FileName);
+                _logger.LogCritical("Exception {message}",exception.Message);
+                _logger.LogTrace(exception.StackTrace);
             }
         }
 
-        private void AddCustomer(string line, FileContentViewModel viewModel)
+        private void AddCustomer(string line, FileContentDto viewModel)
         {
             var customer = GetStandardLine(line);
             if (customer == null)
@@ -75,7 +76,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
             });
         }
 
-        private void AddSalesman(string line, FileContentViewModel viewModel)
+        private void AddSalesman(string line, FileContentDto viewModel)
         {
             var salesman = GetStandardLine(line);
             if (salesman == null)
@@ -89,7 +90,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
             });
         }
 
-        private void AddSale(string line, FileContentViewModel viewModel)
+        private void AddSale(string line, FileContentDto viewModel)
         {
             var lineContent = GetStandardLine(line);
 

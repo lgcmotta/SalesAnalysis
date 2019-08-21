@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using SalesAnalysis.RabbitMQ.EventArgs;
+using SalesAnalysis.RabbitMQ.Helpers;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
 namespace SalesAnalysis.RabbitMQ.Implementations
@@ -34,7 +35,7 @@ namespace SalesAnalysis.RabbitMQ.Implementations
         {
             var retryCount = int.Parse(_configuration["RabbitMqRetryCount"]);
 
-            var policy = PolicyHelper.CreatePolicy(_logger, retryCount);
+            var policy = PolicyHelper.CreateRabbitMqPolicy(_logger, retryCount);
 
             policy.Execute(() =>
             {

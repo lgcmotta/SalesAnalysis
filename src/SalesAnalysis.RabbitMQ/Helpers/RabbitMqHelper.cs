@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 
-namespace SalesAnalysis.RabbitMQ
+namespace SalesAnalysis.RabbitMQ.Helpers
 {
     public static class RabbitMqHelper
     {

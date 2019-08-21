@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SalesAnalysis.SalesProcessor.Core.Domain;
 
-namespace SalesAnalysis.SalesProcessor.Core.ViewModel
+namespace SalesAnalysis.SalesProcessor.Application.DTO
 {
-    public class FileContentViewModel
+    public class FileContentDto
     {
         public InputFile InputFile { get; set; }
 
@@ -13,7 +13,7 @@ namespace SalesAnalysis.SalesProcessor.Core.ViewModel
 
         public List<Sale> Sales { get; set; }
 
-        public FileContentViewModel()
+        public FileContentDto()
         {
             InputFile = new InputFile();
             Salesmen = new List<Salesman>();

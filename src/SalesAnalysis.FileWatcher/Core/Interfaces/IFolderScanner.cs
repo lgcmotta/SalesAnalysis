@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SalesAnalysis.FileWatcher.Core.Scanner
+namespace SalesAnalysis.FileWatcher.Core.Interfaces
 {
     public interface IFolderScanner
     {

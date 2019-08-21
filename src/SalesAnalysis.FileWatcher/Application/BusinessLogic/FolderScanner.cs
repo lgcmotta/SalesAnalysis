@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,14 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
 using SalesAnalysis.FileWatcher.Core.Domain;
-using SalesAnalysis.FileWatcher.Core.Scanner;
+using SalesAnalysis.FileWatcher.Core.Interfaces;
 using SalesAnalysis.FileWatcher.Infrastructure.Persitence;
+using SalesAnalysis.RabbitMQ.Helpers;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWatcher.Application.Scanner
+namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
 {
     public class FolderScanner : IFolderScanner
     {
@@ -36,7 +34,7 @@ namespace SalesAnalysis.FileWatcher.Application.Scanner
 
         public async Task StartFolderScanAsync()
         {
-            var policy = CreatePolicy();
+            var policy = PolicyHelper.CreateSqlPolicy(_logger, 3);
 
             await policy.Execute(ScanFolder);
         }
@@ -85,14 +83,6 @@ namespace SalesAnalysis.FileWatcher.Application.Scanner
                 , ProcessDate = DateTime.Now
             };
 
-        private RetryPolicy CreatePolicy() =>
-            Policy.Handle<SqlException>()
-                .WaitAndRetry(3, retry => TimeSpan.FromSeconds(5)
-                    , (exception, timeSpan, retry, ctx) =>
-                    {
-                        _logger.LogWarning(exception
-                            , "Exception {ExceptionType} with message {Message} detected on attempt {retry} of {retries}"
-                            , exception.GetType().Name, exception.Message, retry, 3);
-                    });
+     
     }
 }

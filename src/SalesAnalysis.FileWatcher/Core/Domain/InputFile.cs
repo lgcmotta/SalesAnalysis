@@ -1,5 +1,4 @@
 ﻿using System;
-using SalesAnalysis.UnitOfWork.Abstractions;
 
 namespace SalesAnalysis.FileWatcher.Core.Domain
 {

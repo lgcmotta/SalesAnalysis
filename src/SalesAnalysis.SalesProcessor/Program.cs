@@ -8,11 +8,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SalesAnalysis.RabbitMQ;
+using SalesAnalysis.RabbitMQ.Helpers;
 using SalesAnalysis.RabbitMQ.Implementations;
 using SalesAnalysis.RabbitMQ.Interfaces;
-using SalesAnalysis.SalesProcessor.Application.Processors;
-using SalesAnalysis.SalesProcessor.Application.Worker;
-using SalesAnalysis.SalesProcessor.Core.Processors;
+using SalesAnalysis.SalesProcessor.Application.BusinessLogic;
+using SalesAnalysis.SalesProcessor.Application.WorkerService;
+using SalesAnalysis.SalesProcessor.Core.Interfaces;
 using SalesAnalysis.SalesProcessor.Infrastructure.Migrations;
 using SalesAnalysis.SalesProcessor.Infrastructure.Persistence;
 using SalesAnalysis.ServicesConfiguration.Configurations;
@@ -63,18 +64,25 @@ namespace SalesAnalysis.SalesProcessor
                         var logger = r.GetRequiredService<ILogger<RabbitMqClientPublisher>>();
                         return new RabbitMqClientPublisher(logger);
                     });
-                    services.AddSingleton<IDbProcessor>(s =>
+                    services.AddSingleton<IOutputDataProcessor>(s =>
                     {
-                        var logger = s.GetRequiredService<ILogger<DbProcessor>>();
+                        var logger = s.GetRequiredService<ILogger<OutputDataProcessor>>();
                         var context = s.GetRequiredService<SalesProcessorDbContext>();
                         var rabbit = s.GetRequiredService<IRabbitMqClientPublisher>();
-                        return new DbProcessor(logger, context, rabbit);
+                        return new OutputDataProcessor(logger, rabbit, configuration, context);
                     });
-                    services.AddSingleton<ISalesProcessor>(s =>
+                    services.AddSingleton<ISalesDataProcessor>(s =>
                     {
-                        var logger = s.GetRequiredService<ILogger<SaleProcessor>>();
-                        var dbProcessor = s.GetRequiredService<IDbProcessor>();
-                        return new SaleProcessor(logger, configuration, dbProcessor);
+                        var logger = s.GetRequiredService<ILogger<SalesDataProcessor>>();
+                        var context = s.GetRequiredService<SalesProcessorDbContext>();
+                        var outputProcessor = s.GetRequiredService<IOutputDataProcessor>();
+                        return new SalesDataProcessor(logger, context, outputProcessor);
+                    });
+                    services.AddSingleton<ISalesFileAnalyser>(s =>
+                    {
+                        var logger = s.GetRequiredService<ILogger<SalesFileAnalyzer>>();
+                        var dbProcessor = s.GetRequiredService<ISalesDataProcessor>();
+                        return new SalesFileAnalyzer(logger, configuration, dbProcessor);
                     });
                 }).UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>(builder =>

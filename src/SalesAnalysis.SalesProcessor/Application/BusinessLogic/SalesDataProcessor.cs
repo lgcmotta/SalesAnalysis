@@ -3,46 +3,60 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SalesAnalysis.RabbitMQ.Helpers;
 using SalesAnalysis.RabbitMQ.Interfaces;
+using SalesAnalysis.SalesProcessor.Application.DTO;
 using SalesAnalysis.SalesProcessor.Core.Domain;
-using SalesAnalysis.SalesProcessor.Core.Processors;
-using SalesAnalysis.SalesProcessor.Core.ViewModel;
+using SalesAnalysis.SalesProcessor.Core.Interfaces;
 using SalesAnalysis.SalesProcessor.Infrastructure.Persistence;
 
-namespace SalesAnalysis.SalesProcessor.Application.Processors
+namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 {
-    public class DbProcessor : IDbProcessor
+    public class SalesDataProcessor : ISalesDataProcessor
     {
-        private readonly ILogger<DbProcessor> _logger;
+        private readonly ILogger<SalesDataProcessor> _logger;
         private readonly SalesProcessorDbContext _context;
-        private readonly IRabbitMqClientPublisher _publisher;
+        private readonly IOutputDataProcessor _processor;
 
-        public DbProcessor(ILogger<DbProcessor> logger, SalesProcessorDbContext context, IRabbitMqClientPublisher publisher)
+        public SalesDataProcessor(ILogger<SalesDataProcessor> logger, SalesProcessorDbContext context,  IOutputDataProcessor processor)
         {
             _logger = logger;
             _context = context;
-            _publisher = publisher;
+            _processor = processor;
         }
 
-        public async Task ProcessDatabaseViewModel(FileContentViewModel viewModel)
+        public async Task SaveContentToDatabase(FileContentDto content)
         {
-            try
+
+            var policy = PolicyHelper.CreateSqlPolicy(_logger, 5);
+
+            policy.Execute(() =>
             {
-                await AddOrUpdateFile(viewModel.InputFile);
+                lock (policy)
+                {
+                    try
+                    {
+                        AddOrUpdateFile(content.InputFile).GetAwaiter();
 
-                await AddOrUpdateSalesman(viewModel.Salesmen);
+                        AddOrUpdateSalesman(content.Salesmen).GetAwaiter();
 
-                await AddOrUpdateCustomer(viewModel.Customers);
+                        AddOrUpdateCustomer(content.Customers).GetAwaiter();
 
-                await AddOrUpdateSales(viewModel.Sales, viewModel.InputFile.FileName);
+                        AddOrUpdateSales(content.Sales, content.InputFile.FileName).GetAwaiter();
 
-                var saved = await _context.SaveAsync();
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                throw;
-            }
+                        var saved = _context.SaveAsync().GetAwaiter().GetResult();
+
+                        if (saved > 0)
+                            _processor.BuildOutputData(content).GetAwaiter();
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.LogError("An unexpected exception occurred while processing view model data.");
+                        _logger.LogError("Exceptiom {message}", exception.Message);
+                        _logger.LogTrace(exception.StackTrace);
+                    }
+                }
+            });
         }
 
         private async Task AddOrUpdateSales(List<Sale> sales, string inputFileFileName)

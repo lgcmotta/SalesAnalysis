@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using SalesAnalysis.FileWatcher.Application.Scanner;
-using SalesAnalysis.FileWatcher.Core.Scanner;
+using SalesAnalysis.FileWatcher.Application.BusinessLogic;
+using SalesAnalysis.FileWatcher.Core.Interfaces;
 using SalesAnalysis.FileWatcher.Infrastructure.Persitence;
 
 namespace SalesAnalysis.FileWatcher.Infrastructure.Modules
