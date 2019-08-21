@@ -17,8 +17,7 @@ namespace SalesAnalysis.RabbitMQ.Implementations
         {
             _logger = logger;
         }
-
-
+        
         public async Task PublishAsync(IConfiguration configuration, object file)
         {
             lock (_syncroot)
@@ -40,7 +39,8 @@ namespace SalesAnalysis.RabbitMQ.Implementations
                         , false
                         , false
                         , null);
-                    
+
+                    //var body = Encoding.GetEncoding("iso-8859-1").GetBytes(JsonConvert.SerializeObject(file));
                     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(file));
 
                     channel.BasicPublish(""

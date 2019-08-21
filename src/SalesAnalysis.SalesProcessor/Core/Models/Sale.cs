@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SalesAnalysis.UnitOfWork.Abstractions;
 
 namespace SalesAnalysis.SalesProcessor.Core.Domain
@@ -7,12 +8,13 @@ namespace SalesAnalysis.SalesProcessor.Core.Domain
     {
         public int Id { get; set; }
 
-        public InputFile InputFile { get; set; }
-        
         public int SaleId { get; set; }
 
         public string SalesmanName { get; set; }
 
-        public ICollection<SaleInfo> SaleInfo { get; set; }
+        public ICollection<SaleInfo> SalesInfo { get; set; }
+
+        public string InputFileName { get; set; }
+
     }
 }

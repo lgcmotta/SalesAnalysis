@@ -41,6 +41,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Worker
 
         private void RabbitMqClientOnRecieve(object sender, EventArgs e)
         {
+            //var file = JsonConvert.DeserializeObject<InputFile>(Encoding.GetEncoding("iso-8859-1").GetString(sender as byte[]));
             var file = JsonConvert.DeserializeObject<InputFile>(Encoding.UTF8.GetString(sender as byte[]));
 
             _salesProcessor.ProcessInputFile(file).GetAwaiter();

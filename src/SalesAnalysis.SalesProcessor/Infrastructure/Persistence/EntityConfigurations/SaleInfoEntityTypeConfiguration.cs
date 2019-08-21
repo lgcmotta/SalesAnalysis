@@ -8,14 +8,11 @@ namespace SalesAnalysis.SalesProcessor.Infrastructure.Persistence.EntityConfigur
     {
         public void Configure(EntityTypeBuilder<SaleInfo> builder)
         {
-            builder.ToTable("SalesInfo");
+            builder.ToTable("SaleDetails");
             builder.HasKey(s => s.Id);
-            builder.Property(s => s.Id).UseSqlServerIdentityColumn();
-            builder.Property(s => s.SaleId).IsRequired();
             builder.Property(s => s.ItemId).IsRequired();
             builder.Property(s => s.ItemPrice).IsRequired();
-            builder.Property(s => s.Quantity).IsRequired();
-
+            builder.Property(s => s.ItemQuantity).IsRequired();
 
         }
     }

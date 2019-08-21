@@ -58,10 +58,23 @@ namespace SalesAnalysis.SalesProcessor
                         var factory = RabbitMqHelper.CreateConnectionFactory(configuration);
                         return new RabbitMqClientReceiver(logger, factory, configuration);
                     });
+                    services.AddSingleton<IRabbitMqClientPublisher>(r =>
+                    {
+                        var logger = r.GetRequiredService<ILogger<RabbitMqClientPublisher>>();
+                        return new RabbitMqClientPublisher(logger);
+                    });
+                    services.AddSingleton<IDbProcessor>(s =>
+                    {
+                        var logger = s.GetRequiredService<ILogger<DbProcessor>>();
+                        var context = s.GetRequiredService<SalesProcessorDbContext>();
+                        var rabbit = s.GetRequiredService<IRabbitMqClientPublisher>();
+                        return new DbProcessor(logger, context, rabbit);
+                    });
                     services.AddSingleton<ISalesProcessor>(s =>
                     {
                         var logger = s.GetRequiredService<ILogger<SaleProcessor>>();
-                        return new SaleProcessor(logger, configuration);
+                        var dbProcessor = s.GetRequiredService<IDbProcessor>();
+                        return new SaleProcessor(logger, configuration, dbProcessor);
                     });
                 }).UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>(builder =>

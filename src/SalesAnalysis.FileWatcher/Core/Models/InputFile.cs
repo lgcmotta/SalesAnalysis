@@ -1,9 +1,9 @@
 ﻿using System;
 using SalesAnalysis.UnitOfWork.Abstractions;
 
-namespace SalesAnalysis.SalesProcessor.Core.Domain
+namespace SalesAnalysis.FileWatcher.Core.Domain
 {
-    public class InputFile : IEntity
+    public class InputFile
     {
         public int Id { get; set; }
 
@@ -16,8 +16,5 @@ namespace SalesAnalysis.SalesProcessor.Core.Domain
         public bool Processed { get; set; }
 
         public DateTime ProcessDate { get; set; }
-
-        public bool Canceled { get; set; }
-        
     }
 }

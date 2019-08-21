@@ -23,6 +23,8 @@ namespace SalesAnalysis.SalesProcessor.Infrastructure.Persistence
 
         public DbSet<Sale> Sales { get; set; }
 
+        public DbSet<SaleInfo> SalesInfo { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new InputFIleEntityTypeConfiguration());

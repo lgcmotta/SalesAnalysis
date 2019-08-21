@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SalesAnalysis.SalesProcessor.Core.Domain;
 using SalesAnalysis.SalesProcessor.Core.Processors;
@@ -16,12 +17,13 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
     {
         private readonly ILogger<SaleProcessor> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IDbProcessor _dbProcessor;
 
-        public SaleProcessor(ILogger<SaleProcessor> logger, IConfiguration configuration)
+        public SaleProcessor(ILogger<SaleProcessor> logger, IConfiguration configuration, IDbProcessor dbProcessor)
         {
             _logger = logger;
-            
             _configuration = configuration;
+            _dbProcessor = dbProcessor;
         }
 
         public async Task ProcessInputFile(InputFile inputFile)
@@ -35,8 +37,12 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
 
                 var fileContent = await File.ReadAllLinesAsync(fullPath, CancellationToken.None);
 
-                var viewModel = new FileContentViewModel();
+                var viewModel = new FileContentViewModel {InputFile = inputFile};
 
+                viewModel.InputFile.Processed = true;
+                viewModel.InputFile.Canceled = false;
+                viewModel.InputFile.ProcessDate = DateTime.Now;
+                
                 foreach (var line in fileContent)
                 {
                     if (line.StartsWith(_configuration["SalesmanIdentifier"]))
@@ -46,6 +52,8 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
                     if(line.StartsWith(_configuration["SaleIdentifier"]))
                         AddSale(line, viewModel);
                 }
+
+                await _dbProcessor.ProcessDatabaseViewModel(viewModel);
 
             }
             catch (Exception exception)
@@ -96,21 +104,22 @@ namespace SalesAnalysis.SalesProcessor.Application.Processors
             var saleInfo = (from saleData in salesData
                 select saleData.Split(_configuration["SaleDataSeparator"]) 
                 into data where data.Length >= 0
-                select (int.Parse(data[0]), int.Parse(data[1]), float.Parse(data[2])))
+                select (int.Parse(data[0].Replace(_configuration["SaleDataStartDelimiter"],string.Empty))
+                    , int.Parse(data[1])
+                    , float.Parse(data[2].Replace(_configuration["SaleDataEndDelimiter"], string.Empty))))
                 .ToList();
 
             var sale = new Sale
             {
-                InputFile = viewModel.InputFile
-                , SaleId = int.Parse(lineContent.Value.first)
+                 SaleId = int.Parse(lineContent.Value.first)
                 , SalesmanName = lineContent.Value.third.ToString()
-                , SaleInfo = new List<SaleInfo>()
+                , SalesInfo = new List<SaleInfo>()
             };
 
-            saleInfo.ForEach(s => sale.SaleInfo.Add(new SaleInfo
+            saleInfo.ForEach(s => sale.SalesInfo.Add(new SaleInfo
             {
                 ItemId = s.Item1,
-                Quantity = s.Item2,
+                ItemQuantity = s.Item2,
                 ItemPrice = s.Item3
             }));
             

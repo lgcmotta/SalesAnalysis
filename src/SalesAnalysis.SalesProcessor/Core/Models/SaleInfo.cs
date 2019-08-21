@@ -6,12 +6,14 @@ namespace SalesAnalysis.SalesProcessor.Core.Domain
     {
         public int Id { get; set; }
 
-        public int SaleId { get; set; }
-
         public int ItemId { get; set; }
 
-        public int Quantity { get; set; }
+        public int ItemQuantity { get; set; }
 
         public float ItemPrice { get; set; }
+
+        public int FkSale { get; set; }
+
+        public Sale Sale { get; set; }
     }
 }

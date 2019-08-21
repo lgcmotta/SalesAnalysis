@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SalesAnalysis.SalesProcessor.Core.Domain;
 
@@ -11,18 +12,16 @@ namespace SalesAnalysis.SalesProcessor.Infrastructure.Persistence.EntityConfigur
             builder.ToTable("Sales");
 
             builder.HasKey(s => s.Id);
-
-            builder.Property(s => s.Id).UseSqlServerIdentityColumn();
-
-            builder.Property(s => s.InputFile).IsRequired();
-
-            builder.HasOne(s => s.InputFile);
-
+            
             builder.Property(s => s.SaleId).IsRequired();
 
             builder.Property(s => s.SalesmanName).IsRequired();
 
-            builder.HasMany(s => s.SaleInfo);
+            builder.Property(s => s.InputFileName).IsRequired();
+
+            builder.HasMany(p => p.SalesInfo)
+                .WithOne(p => p.Sale)
+                .HasForeignKey(f => f.FkSale);
 
         }
     }

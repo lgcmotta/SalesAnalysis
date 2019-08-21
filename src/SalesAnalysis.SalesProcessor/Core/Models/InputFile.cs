@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using SalesAnalysis.UnitOfWork.Abstractions;
 
-namespace SalesAnalysis.FileWatcher.Core.Domain
+namespace SalesAnalysis.SalesProcessor.Core.Domain
 {
-    public class InputFile : IEntity
+    public class InputFile
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public string FileName { get; set; }
 
@@ -16,5 +19,7 @@ namespace SalesAnalysis.FileWatcher.Core.Domain
         public bool Processed { get; set; }
 
         public DateTime ProcessDate { get; set; }
+
+        public bool Canceled { get; set; }
     }
 }
