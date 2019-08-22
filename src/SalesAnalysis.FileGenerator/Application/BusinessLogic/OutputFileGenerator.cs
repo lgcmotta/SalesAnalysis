@@ -42,7 +42,8 @@ namespace SalesAnalysis.FileGenerator.Application.BusinessLogic
                 SalesmenQuantity = outputDto.SalesmenQuantity,
                 CustomersQuantity = outputDto.CustomersQuantity,
                 MostExpensiveSale = outputDto.MostExpensiveSale,
-                WorstSalesman = outputDto.WorstSalesman
+                WorstSalesman = outputDto.WorstSalesman,
+                GenerationDate = outputDto.GenerationDate
             };
 
             var folderFiles = GetFilesInfolder();
@@ -65,7 +66,7 @@ namespace SalesAnalysis.FileGenerator.Application.BusinessLogic
 
             _logger.LogInformation("Saving processed file into the database for service trace history");
 
-            _context.Add((object) outputContent);
+            _context.OutputFilesContent.Add(outputContent);
 
             _context.SaveChanges();
         }

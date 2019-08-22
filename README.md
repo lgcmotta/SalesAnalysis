@@ -39,5 +39,5 @@ C:\HOMEPATH\data\out (or var/lib/HOMEPATH/data/out for Linux)
 --------- Most Expensive Sale Id: 10
 --------- Worst Salesman: Paulo
 
---------- Output Generated At: 0001-01-01 00:00:00
+--------- Output Generated At: 2019-08-22 19:44:38
 ```
