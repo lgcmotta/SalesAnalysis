@@ -28,7 +28,7 @@ namespace SalesAnalysis.FileWatcher
             }
             catch (Exception exception)
             {
-
+                Main(args);
             }
         }
 

@@ -18,6 +18,7 @@ namespace SalesAnalysis.FileWatcher
         public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
+
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -25,14 +26,13 @@ namespace SalesAnalysis.FileWatcher
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                //await Task.Delay(1000, stoppingToken);
                 var createScope = _serviceScopeFactory.CreateScope();
-                _folderScanner = createScope.ServiceProvider.GetRequiredService<IFolderScanner>();
-                _folderScanner.StartFolderScanAsync();
 
-                //await Task.Delay(5000, stoppingToken);
+                _folderScanner = createScope.ServiceProvider.GetRequiredService<IFolderScanner>();
+
+               await Task.Run(() => _folderScanner.StartFolderScanAsync(), stoppingToken);
             }
+
         }
     }
 }

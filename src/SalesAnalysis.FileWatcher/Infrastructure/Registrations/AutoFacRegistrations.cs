@@ -19,9 +19,9 @@ namespace SalesAnalysis.FileWatcher.Infrastructure.Registrations
                 .As<IRabbitMqClientPublisher>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<RabbitMqClientReceiver>()
-                .As<IRabbitMqClientReceiver>()
-                .InstancePerLifetimeScope();
+            //builder.RegisterType<RabbitMqClientReceiver>()
+            //    .As<IRabbitMqClientReceiver>()
+            //    .InstancePerLifetimeScope();
 
             builder.RegisterType(typeof(FileWatcherDbContext));
         }

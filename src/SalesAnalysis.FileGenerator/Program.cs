@@ -1,17 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence;
+using SalesAnalysis.FileGenerator.Infrastructure.Extensions;
+using SalesAnalysis.FileGenerator.Infrastructure.Migrations;
 using SalesAnalysis.ServicesConfiguration.Configurations;
-using SalesAnalysis.FileWriter.Infrastructure.Extensions;
-using SalesAnalysis.FileWriter.Infrastructure.Migrations;
-using SalesAnalysis.FileWriter.Infrastructure.Registrations;
 
-namespace SalesAnalysis.FileWriter
+namespace SalesAnalysis.FileGenerator
 {
     public class Program
     {
@@ -21,16 +21,17 @@ namespace SalesAnalysis.FileWriter
             {
                 var configuration = ConfigurationFactory.GetConfiguration();
 
-                var host = CreateHostBuilder(configuration,args).Build();
+                var host = CreateHostBuilder(configuration, args).Build();
 
                 var migratedbContext = new MigrateDbContext(host.Services);
+
                 migratedbContext.MigrateContext();
 
                 host.Run();
             }
             catch (Exception exception)
             {
-                
+
             }
         }
 
@@ -40,7 +41,6 @@ namespace SalesAnalysis.FileWriter
                 {
                     services.AddHostedService<Worker>();
                     services.AddSqlServerConfiguration(configuration);
-                    services.AddAutoMapperConfiguration();
                     services.AddRabbitMqConfiguration();
                     services.AddOutputFileGeneratorConfiguration(configuration);
                 }).UseServiceProviderFactory(new AutofacServiceProviderFactory())

@@ -12,22 +12,16 @@ namespace SalesAnalysis.RabbitMQ.Implementations
     {
         private readonly ILogger<RabbitMqClientReceiver> _logger;
 
-        private ConnectionFactory _connectionFactory;
-        private IConnection _connection;
-        private EventingBasicConsumer _consumer;
-        private IModel _channel;
+        private static ConnectionFactory _connectionFactory;
+        private static IConnection _connection;
+        private static EventingBasicConsumer _consumer;
+        private static IModel _channel;
 
         public event EventHandler Receive;
 
         public RabbitMqClientReceiver(ILogger<RabbitMqClientReceiver> logger)
         {
             _logger = logger;
-        }
-
-        public IModel Channel
-        {
-            get => _channel;
-            set => _channel = value;
         }
 
         public void ConfigureChannel(string hostName, string username, string password, int retryCount, string queueName)
@@ -40,7 +34,9 @@ namespace SalesAnalysis.RabbitMQ.Implementations
             {
                 _connectionFactory = new ConnectionFactory()
                 {
-                    HostName = hostName, UserName = username, Password = password
+                    HostName = hostName
+                    , UserName = username
+                    , Password = password
                 };
 
                 _connection = _connectionFactory.CreateConnection();
@@ -57,7 +53,7 @@ namespace SalesAnalysis.RabbitMQ.Implementations
 
                 _consumer.Received += OnConsumerOnReceived;
 
-                _channel.BasicConsume(queueName, false, _consumer);
+                _channel.BasicConsume(queueName, true, _consumer);
 
                 _logger.LogInformation("RabbitMQ Client is ready to receive messages");
 

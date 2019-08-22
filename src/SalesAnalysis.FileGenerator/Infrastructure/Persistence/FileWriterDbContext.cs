@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SalesAnalysis.FileWriter.Core.Domain;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence.EntityConfigurations;
+using SalesAnalysis.FileGenerator.Core.Domain;
+using SalesAnalysis.FileGenerator.Infrastructure.Persistence.EntityConfigurations;
 
-namespace SalesAnalysis.FileWriter.Infrastructure.Persistence
+namespace SalesAnalysis.FileGenerator.Infrastructure.Persistence
 {
     public class FileWriterDbContext : DbContext
     {

@@ -27,7 +27,7 @@ namespace SalesAnalysis.SalesProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddRabbitMqReceieverConfiguration(this IServiceCollection services)
         {
-            services.AddSingleton<IRabbitMqClientReceiver>(r =>
+            services.AddScoped<IRabbitMqClientReceiver>(r =>
             {
                 var logger = r.GetRequiredService<ILogger<RabbitMqClientReceiver>>();
                 return new RabbitMqClientReceiver(logger);

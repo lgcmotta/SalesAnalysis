@@ -19,20 +19,6 @@ services:
       - "5672:5672"
       - "15672:15672"
 
-  salesanalysis.filewriter:
-    image: ${DOCKER_REGISTRY-}salesanalysisfilewriter
-    build:
-      context: .
-      dockerfile: src/SalesAnalysis.FileWriter/Dockerfile
-    environment:
-      - DOTNET_ENVIRONMENT=Development
-    volumes:
-      - C:/HOMEPATH/data/out:/var/lib/HOMEPATH/data/out
-      - C:/HOMEPATH/data/templateFiles:/var/lib/HOMEPATH/data/templateFiles
-    depends_on:
-      - sqlserver
-      - rabbitmq
-
   salesanalysis.filewatcher:
     image: ${DOCKER_REGISTRY-}salesanalysisfilewatcher
     build:
@@ -45,7 +31,6 @@ services:
     depends_on:
       - sqlserver
       - rabbitmq
-
   salesanalysis.salesprocessor:
     image: ${DOCKER_REGISTRY-}salesanalysissalesprocessor
     build:
@@ -55,10 +40,19 @@ services:
       - DOTNET_ENVIRONMENT=Development
     volumes:
       - C:/HOMEPATH/data/in:/var/lib/HOMEPATH/data/in
-      - C:/HOMEPATH/data/out:/var/lib/HOMEPATH/data/out
     depends_on:
       - sqlserver
       - rabbitmq
-
-
-
+  salesanalysis.filegenerator:
+    image: ${DOCKER_REGISTRY-}salesanalysisfilegenerator
+    build:
+      context: .
+      dockerfile: src/SalesAnalysis.FileGenerator/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    volumes:
+      - C:/HOMEPATH/data/templateFiles:/var/lib/HOMEPATH/data/templateFiles
+      - C:/HOMEPATH/data/out:/var/lib/HOMEPATH/data/out
+    depends_on:
+      - sqlserver
+      - rabbitmq 

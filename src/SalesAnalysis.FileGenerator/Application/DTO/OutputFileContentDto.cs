@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SalesAnalysis.FileWriter.Application.DTO
+namespace SalesAnalysis.FileGenerator.Application.DTO
 {
     public class OutputFileContentDto
     {

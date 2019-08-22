@@ -39,4 +39,8 @@
     <Folder Include="Application\WorkerService\" />
     <Folder Include="Infrastructure\Migrations\" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if not exist &quot;C:\HOMEPATH\data\in&quot; mkdir &quot;C:\HOMEPATH\data\in&quot;" />
+  </Target>
 </Project>

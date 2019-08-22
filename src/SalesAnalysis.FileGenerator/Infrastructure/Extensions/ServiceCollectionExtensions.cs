@@ -1,34 +1,20 @@
 ﻿using System;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SalesAnalysis.FileWriter.Application.BusinessLogic;
-using SalesAnalysis.FileWriter.Application.DTO;
-using SalesAnalysis.FileWriter.Core.Domain;
-using SalesAnalysis.FileWriter.Core.Interfaces;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence;
+using SalesAnalysis.FileGenerator.Application.BusinessLogic;
+using SalesAnalysis.FileGenerator.Application.DTO;
+using SalesAnalysis.FileGenerator.Core.Domain;
+using SalesAnalysis.FileGenerator.Core.Interfaces;
+using SalesAnalysis.FileGenerator.Infrastructure.Persistence;
 using SalesAnalysis.RabbitMQ.Implementations;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWriter.Infrastructure.Extensions
+namespace SalesAnalysis.FileGenerator.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services)
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<OutputFileContentDto, OutputFileContent>()
-                    .ForMember(x => x.Id, x => x.Ignore());
-                cfg.CreateMap<OutputFileContent, OutputFileContentDto>();
-            });
-            var mapper = config.CreateMapper();
-            services.AddSingleton(mapper);
-            return services;
-        }
-
         public static IServiceCollection AddSqlServerConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddEntityFrameworkSqlServer()
@@ -42,7 +28,7 @@ namespace SalesAnalysis.FileWriter.Infrastructure.Extensions
 
         public static IServiceCollection AddRabbitMqConfiguration(this IServiceCollection services)
         {
-            services.AddSingleton<IRabbitMqClientReceiver>(r =>
+            services.AddScoped<IRabbitMqClientReceiver>(r =>
             {
                 var logger = r.GetRequiredService<ILogger<RabbitMqClientReceiver>>();
                 return new RabbitMqClientReceiver(logger);
@@ -56,9 +42,8 @@ namespace SalesAnalysis.FileWriter.Infrastructure.Extensions
             services.AddSingleton<IOutputFileGenerator>(o =>
             {
                 var logger = o.GetRequiredService<ILogger<OutputFileGenerator>>();
-                var mapper = o.GetRequiredService<IMapper>();
                 var context = o.GetRequiredService<FileWriterDbContext>();
-                return new OutputFileGenerator(logger, configuration, mapper, context);
+                return new OutputFileGenerator(logger, configuration, context);
             });
             return services;
         }

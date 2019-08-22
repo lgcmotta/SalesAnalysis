@@ -13,15 +13,15 @@ using SalesAnalysis.SalesProcessor.Core.Interfaces;
 
 namespace SalesAnalysis.SalesProcessor
 {
-    public class Worker : BackgroundService
+    public class SalesProcessorWorker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<SalesProcessorWorker> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IConfiguration _configuration;
         private static IRabbitMqClientReceiver _clientReceiver;
         private static ISalesFileAnalyser _salesFileAnalyser;
         private static bool _firstTime = true;
-        public Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
+        public SalesProcessorWorker(ILogger<SalesProcessorWorker> logger, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
@@ -32,7 +32,7 @@ namespace SalesAnalysis.SalesProcessor
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //await Task.Delay(5000, stoppingToken);
+                await Task.Delay(2000, stoppingToken);
 
                 _logger.LogInformation("Sales processor running at: {time}", DateTimeOffset.Now);
 
@@ -54,7 +54,6 @@ namespace SalesAnalysis.SalesProcessor
                 _clientReceiver.Receive += RabbitMqClientMessageReceived;
 
                 _firstTime = false;
-
             }
         }
 

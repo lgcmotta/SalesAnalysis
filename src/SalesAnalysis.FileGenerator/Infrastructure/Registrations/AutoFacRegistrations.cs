@@ -1,11 +1,11 @@
 ﻿using Autofac;
-using SalesAnalysis.FileWriter.Application.BusinessLogic;
-using SalesAnalysis.FileWriter.Core.Interfaces;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence;
+using SalesAnalysis.FileGenerator.Application.BusinessLogic;
+using SalesAnalysis.FileGenerator.Core.Interfaces;
+using SalesAnalysis.FileGenerator.Infrastructure.Persistence;
 using SalesAnalysis.RabbitMQ.Implementations;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWriter.Infrastructure.Registrations
+namespace SalesAnalysis.FileGenerator.Infrastructure.Registrations
 {
     public class AutoFacRegistrations : Module
     {

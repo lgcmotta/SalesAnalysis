@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SalesAnalysis.FileWriter": {
+    "SalesAnalysis.FileGenerator": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"

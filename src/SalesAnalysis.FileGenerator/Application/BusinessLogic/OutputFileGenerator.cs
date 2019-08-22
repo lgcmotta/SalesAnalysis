@@ -1,34 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SalesAnalysis.FileWriter.Application.DTO;
-using SalesAnalysis.FileWriter.Core.Domain;
-using SalesAnalysis.FileWriter.Core.Interfaces;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence;
+using RabbitMQ.Client;
+using SalesAnalysis.FileGenerator.Application.DTO;
+using SalesAnalysis.FileGenerator.Core.Domain;
+using SalesAnalysis.FileGenerator.Core.Interfaces;
+using SalesAnalysis.FileGenerator.Infrastructure.Persistence;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWriter.Application.BusinessLogic
+namespace SalesAnalysis.FileGenerator.Application.BusinessLogic
 {
     public class OutputFileGenerator : IOutputFileGenerator
     {
         private readonly ILogger<OutputFileGenerator> _logger;
         private readonly IRabbitMqClientReceiver _clientReceiver;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
         private readonly FileWriterDbContext _context;
+
+
+        private static ConnectionFactory _connectionFactory;
 
         public OutputFileGenerator(ILogger<OutputFileGenerator> logger
             , IConfiguration configuration
-            , IMapper mapper
             , FileWriterDbContext context)
         {
             _logger = logger;
             _configuration = configuration;
-            _mapper = mapper;
             _context = context;
         }
 
@@ -36,7 +35,15 @@ namespace SalesAnalysis.FileWriter.Application.BusinessLogic
         {
             _logger.LogInformation($"{outputDto.FileName} output is been generated.");
 
-            var outputContent = _mapper.Map<OutputFileContent>(outputDto);
+            var outputContent = new OutputFileContent
+            {
+                FileName = outputDto.FileName,
+                FileExtension = outputDto.FileExtension,
+                SalesmenQuantity = outputDto.SalesmenQuantity,
+                CustomersQuantity = outputDto.CustomersQuantity,
+                MostExpensiveSale = outputDto.MostExpensiveSale,
+                WorstSalesman = outputDto.WorstSalesman
+            };
 
             var folderFiles = GetFilesInfolder();
 
@@ -58,7 +65,7 @@ namespace SalesAnalysis.FileWriter.Application.BusinessLogic
 
             _logger.LogInformation("Saving processed file into the database for service trace history");
 
-            _context.Add(outputContent);
+            _context.Add((object) outputContent);
 
             _context.SaveChanges();
         }

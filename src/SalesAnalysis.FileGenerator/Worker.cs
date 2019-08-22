@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,11 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SalesAnalysis.FileWriter.Application.DTO;
-using SalesAnalysis.FileWriter.Core.Interfaces;
+using SalesAnalysis.FileGenerator.Application.DTO;
+using SalesAnalysis.FileGenerator.Core.Interfaces;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
-namespace SalesAnalysis.FileWriter
+namespace SalesAnalysis.FileGenerator
 {
     public class Worker : BackgroundService
     {
@@ -33,7 +35,7 @@ namespace SalesAnalysis.FileWriter
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //await Task.Delay(5000, stoppingToken);
+                await Task.Delay(2000, stoppingToken);
 
                 if (!_firstTime)
                     continue;
@@ -44,22 +46,22 @@ namespace SalesAnalysis.FileWriter
 
                 _fileGenerator = createScope.ServiceProvider.GetRequiredService<IOutputFileGenerator>();
 
-                 _clientReceiver.ConfigureChannel(_configuration["RabbitMqHostName"]
-                    , _configuration["RabbitMqUsername"]
-                    , _configuration["RabbitMqPassword"]
-                    , int.Parse(_configuration["RabbitMqRetryCount"])
-                    , _configuration["RabbitMqReceiveQueueName"]);
+                _clientReceiver.ConfigureChannel(_configuration["RabbitMqHostName"]
+                   , _configuration["RabbitMqUsername"]
+                   , _configuration["RabbitMqPassword"]
+                   , int.Parse(_configuration["RabbitMqRetryCount"])
+                   , _configuration["RabbitMqReceiveQueueName"]);
 
-                 _clientReceiver.Receive += (sender, args) =>
-                 {
-                     var outputContentDto =
-                         JsonConvert.DeserializeObject<OutputFileContentDto>(Encoding.UTF8.GetString(sender as byte[]));
+                _clientReceiver.Receive += (sender, args) =>
+                {
+                    var outputContentDto =
+                        JsonConvert.DeserializeObject<OutputFileContentDto>(Encoding.UTF8.GetString(sender as byte[]));
 
-                     if (outputContentDto == null)
-                         return;
+                    if (outputContentDto == null)
+                        return;
 
-                     _fileGenerator.GenerateFIle(outputContentDto);
-                 };
+                    _fileGenerator.GenerateFIle(outputContentDto);
+                };
 
                 _firstTime = false;
             }

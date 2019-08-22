@@ -6,8 +6,6 @@ namespace SalesAnalysis.RabbitMQ.Interfaces
 {
     public interface IRabbitMqClientReceiver
     {
-        IModel Channel { get; set; }
-
         void  ConfigureChannel(string hostName, string username, string password
             , int retryCount, string queueName);
 

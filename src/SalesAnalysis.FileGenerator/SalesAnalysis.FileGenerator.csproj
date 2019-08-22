@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <UserSecretsId>dotnet-SalesAnalysis.FileWriter-D6C1B022-087C-4F6B-A71F-FAAE78B37B0E</UserSecretsId>
+    <UserSecretsId>dotnet-SalesAnalysis.FileGenerator-C701CB6A-C0B5-4EEE-AE43-8C5F69534CAA</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
@@ -10,7 +10,6 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
@@ -20,7 +19,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Polly" Version="7.1.0" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
   </ItemGroup>
@@ -37,8 +35,7 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\WorkingService\" />
-    <Folder Include="Infrastructure\Migrations\" />
-  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if not exist &quot;C:\HOMEPATH\data\out&quot; mkdir &quot;C:\HOMEPATH\data\out&quot;&#xD;&#xA;if not exist &quot;C:\HOMEPATH\data\templateFiles&quot; mkdir &quot;C:\HOMEPATH\data\templateFiles&quot;&#xD;&#xA;copy &quot;$(OutDir)TemplateFiles\OutputTemplate.txt&quot; &quot;C:\HOMEPATH\data\templateFiles&quot;" />
+  </Target>
 </Project>

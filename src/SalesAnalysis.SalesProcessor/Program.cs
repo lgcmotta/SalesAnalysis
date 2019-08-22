@@ -5,6 +5,8 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SalesAnalysis.RabbitMQ.Implementations;
+using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.SalesProcessor.Infrastructure.Extensions;
 using SalesAnalysis.SalesProcessor.Infrastructure.Migrations;
 using SalesAnalysis.SalesProcessor.Infrastructure.Persistence;
@@ -37,14 +39,17 @@ namespace SalesAnalysis.SalesProcessor
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddHostedService<Worker>();
+                    services.AddHostedService<SalesProcessorWorker>();
                     services.AddSqlServerConfiguration(configuration);
-                    services.AddRabbitMqReceieverConfiguration();
                     services.AddRabbitMqPublisherConfiguration();
+                    services.AddRabbitMqReceieverConfiguration();
                     services.AddOutputDataProcessorConfiguration(configuration);
                     services.AddSalesDataProcessorConfiguration(configuration);
                     services.AddSalesFileAnalyserConfiguration(configuration);
                 }).UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureContainer<ContainerBuilder>(builder => { builder.RegisterType(typeof(SalesProcessorDbContext));});
+                .ConfigureContainer<ContainerBuilder>(builder =>
+                {
+                    builder.RegisterType(typeof(SalesProcessorDbContext));
+                });
     }
 }

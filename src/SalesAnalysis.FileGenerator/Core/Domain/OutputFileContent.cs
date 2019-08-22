@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SalesAnalysis.FileWriter.Core.Domain
+namespace SalesAnalysis.FileGenerator.Core.Domain
 {
     public class OutputFileContent
     {

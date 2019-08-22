@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using SalesAnalysis.FileWriter.Infrastructure.Persistence;
+using SalesAnalysis.FileGenerator.Infrastructure.Persistence;
 
-namespace SalesAnalysis.FileWriter.Infrastructure.Migrations
+namespace SalesAnalysis.FileGenerator.Infrastructure.Migrations
 {
     public class MigrateDbContext
     {

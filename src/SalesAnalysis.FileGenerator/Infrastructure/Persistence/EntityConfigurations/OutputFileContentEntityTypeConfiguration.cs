@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SalesAnalysis.FileWriter.Core.Domain;
+using SalesAnalysis.FileGenerator.Core.Domain;
 
-namespace SalesAnalysis.FileWriter.Infrastructure.Persistence.EntityConfigurations
+namespace SalesAnalysis.FileGenerator.Infrastructure.Persistence.EntityConfigurations
 {
     public class OutputFileContentEntityTypeConfiguration : IEntityTypeConfiguration<OutputFileContent>
     {
