@@ -7,7 +7,8 @@ namespace SalesAnalysis.RabbitMQ.Interfaces
 {
     public interface IRabbitMqClientReceiver
     {
-        Task ConfigureChannel();
+        Task ConfigureChannel(string hostName, string username, string password
+            , int retryCount, string queueName);
 
         event EventHandler Receive;
 

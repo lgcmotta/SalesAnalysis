@@ -19,16 +19,17 @@ namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
     {
         private readonly ILogger<FolderScanner> _logger;
         private readonly FileWatcherDbContext _context;
-        private string _folderPath;
         private readonly IConfiguration _configuration;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IRabbitMqClientPublisher _publisher;
+        private string _folderPath;
 
-        public FolderScanner(ILogger<FolderScanner> logger, IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, FileWatcherDbContext context)
+
+        public FolderScanner(ILogger<FolderScanner> logger, IConfiguration configuration, IRabbitMqClientPublisher publisher, FileWatcherDbContext context)
         {
             _logger = logger;
             _context = context;
             _configuration = configuration;
-            _serviceScopeFactory = serviceScopeFactory;
+            _publisher = publisher;
             _folderPath = configuration["InputFolder"];
         }
 
@@ -61,11 +62,12 @@ namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
 
                 await _context.InputFiles.AddAsync(file);
 
-                var createScope = _serviceScopeFactory.CreateScope();
-
-                var rabbitMqClientPublisher = createScope.ServiceProvider.GetRequiredService<IRabbitMqClientPublisher>();
-
-                await rabbitMqClientPublisher.PublishAsync(_configuration, file);
+                await _publisher.PublishAsync(file
+                    , _configuration["RabbitMqHostName"]
+                    , _configuration["RabbitMqUsername"]
+                    , _configuration["RabbitMqPassword"]
+                    ,int.Parse(_configuration["RabbitMqRetryCount"])
+                    ,_configuration["RabbitMqPublishQueueName"]);
             }
 
             var saved = await _context.SaveAsync();

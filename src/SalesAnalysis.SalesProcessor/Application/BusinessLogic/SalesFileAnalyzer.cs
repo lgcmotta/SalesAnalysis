@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.SalesProcessor.Application.DTO;
 using SalesAnalysis.SalesProcessor.Core.Domain;
 using SalesAnalysis.SalesProcessor.Core.Interfaces;
@@ -17,12 +18,14 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
         private readonly ILogger<SalesFileAnalyzer> _logger;
         private readonly IConfiguration _configuration;
         private readonly ISalesDataProcessor _salesDataProcessor;
+        private readonly IRabbitMqClientPublisher _publisher;
 
-        public SalesFileAnalyzer(ILogger<SalesFileAnalyzer> logger, IConfiguration configuration, ISalesDataProcessor salesDataProcessor)
+        public SalesFileAnalyzer(ILogger<SalesFileAnalyzer> logger, IConfiguration configuration, ISalesDataProcessor salesDataProcessor, IRabbitMqClientPublisher publisher)
         {
             _logger = logger;
             _configuration = configuration;
             _salesDataProcessor = salesDataProcessor;
+            _publisher = publisher;
         }
 
         public async Task ProcessInputFile(InputFile inputFile)
@@ -36,23 +39,37 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 
                 var fileContent = await File.ReadAllLinesAsync(fullPath, CancellationToken.None);
 
-                var viewModel = new FileContentDto {InputFile = inputFile};
+                if (fileContent == null || fileContent.Length == 0)
+                {
+                    await ProcessFileFailed(inputFile);
+                    return;
+                }
+                
+                var contentDto = new FileContentDto {InputFile = inputFile};
 
-                viewModel.InputFile.Processed = true;
-                viewModel.InputFile.Canceled = false;
-                viewModel.InputFile.ProcessDate = DateTime.Now;
+                contentDto.InputFile.Processed = true;
+                contentDto.InputFile.Canceled = false;
+                contentDto.InputFile.ProcessDate = DateTime.Now;
                 
                 foreach (var line in fileContent)
                 {
                     if (line.StartsWith(_configuration["SalesmanIdentifier"]))
-                        AddSalesman(line, viewModel);
+                        AddSalesman(line, contentDto);
                     if (line.StartsWith(_configuration["CustomerIdentifier"]))
-                        AddCustomer(line, viewModel);
+                        AddCustomer(line, contentDto);
                     if(line.StartsWith(_configuration["SaleIdentifier"]))
-                        AddSale(line, viewModel);
+                        AddSale(line, contentDto);
                 }
 
-                await _salesDataProcessor.SaveContentToDatabase(viewModel);
+                if (!contentDto.Customers.Any()
+                    && !contentDto.Sales.Any()
+                    && !contentDto.Salesmen.Any())
+                {
+                    await ProcessFileFailed(inputFile);
+                    return;
+                }
+
+                await _salesDataProcessor.SaveContentToDatabase(contentDto);
 
             }
             catch (Exception exception)
@@ -61,6 +78,20 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
                 _logger.LogCritical("Exception {message}",exception.Message);
                 _logger.LogTrace(exception.StackTrace);
             }
+        }
+
+        private async Task ProcessFileFailed(InputFile inputFile)
+        {
+            _logger.LogCritical("{FileName} couldn't be processed.", inputFile.FileName);
+
+            await _publisher.PublishAsync(inputFile
+                , _configuration["RabbitMqHostnName"]
+                , _configuration["RabbitMqUserName"]
+                , _configuration["RabbitMqPassword"]
+                , int.Parse(_configuration["RabbitMqRetryCount"])
+                , _configuration["RabbitMqFailedQueueName"]);
+
+            return;
         }
 
         private void AddCustomer(string line, FileContentDto viewModel)

@@ -6,7 +6,5 @@ namespace SalesAnalysis.SalesProcessor.Core.Interfaces
     public interface IOutputDataProcessor
     {
         Task BuildOutputData(FileContentDto fileContent);
-
-        Task SendOutputData();
     }
 }

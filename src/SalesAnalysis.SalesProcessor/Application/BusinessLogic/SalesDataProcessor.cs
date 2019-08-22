@@ -30,33 +30,26 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 
             var policy = PolicyHelper.CreateSqlPolicy(_logger, 5);
 
-            policy.Execute(() =>
+            await policy.Execute(async () =>
             {
-                lock (policy)
-                {
-                    try
-                    {
-                        AddOrUpdateFile(content.InputFile).GetAwaiter();
+                await AddOrUpdateFile(content.InputFile);
 
-                        AddOrUpdateSalesman(content.Salesmen).GetAwaiter();
+                await AddOrUpdateSalesman(content.Salesmen);
 
-                        AddOrUpdateCustomer(content.Customers).GetAwaiter();
+                await AddOrUpdateCustomer(content.Customers);
 
-                        AddOrUpdateSales(content.Sales, content.InputFile.FileName).GetAwaiter();
+                await AddOrUpdateSales(content.Sales, content.InputFile.FileName);
 
-                        var saved = _context.SaveAsync().GetAwaiter().GetResult();
+                var saved = await _context.SaveAsync();
 
-                        if (saved > 0)
-                            _processor.BuildOutputData(content).GetAwaiter();
-                    }
-                    catch (Exception exception)
-                    {
-                        _logger.LogError("An unexpected exception occurred while processing view model data.");
-                        _logger.LogError("Exceptiom {message}", exception.Message);
-                        _logger.LogTrace(exception.StackTrace);
-                    }
-                }
+                if (saved > 0)
+                    _processor.BuildOutputData(content).GetAwaiter();
+          
             });
+
+            //_logger.LogError("An unexpected exception occurred while processing view model data.");
+            //_logger.LogError("Exceptiom {message}", exception.Message);
+            //_logger.LogTrace(exception.StackTrace);
         }
 
         private async Task AddOrUpdateSales(List<Sale> sales, string inputFileFileName)

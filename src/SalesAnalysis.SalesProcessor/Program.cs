@@ -31,6 +31,7 @@ namespace SalesAnalysis.SalesProcessor
                 var host = CreateHostBuilder(configuration,args).Build();
 
                 var migrateDbContext = new MigrateDbContext(host.Services);
+
                 migrateDbContext.PerformDbContextMigration();
 
                 await  host.RunAsync();
@@ -56,8 +57,7 @@ namespace SalesAnalysis.SalesProcessor
                     services.AddSingleton<IRabbitMqClientReceiver>(r =>
                     {
                         var logger = r.GetRequiredService<ILogger<RabbitMqClientReceiver>>();
-                        var factory = RabbitMqHelper.CreateConnectionFactory(configuration);
-                        return new RabbitMqClientReceiver(logger, factory, configuration);
+                        return new RabbitMqClientReceiver(logger);
                     });
                     services.AddSingleton<IRabbitMqClientPublisher>(r =>
                     {
@@ -82,7 +82,8 @@ namespace SalesAnalysis.SalesProcessor
                     {
                         var logger = s.GetRequiredService<ILogger<SalesFileAnalyzer>>();
                         var dbProcessor = s.GetRequiredService<ISalesDataProcessor>();
-                        return new SalesFileAnalyzer(logger, configuration, dbProcessor);
+                        var rabbit = s.GetRequiredService<IRabbitMqClientPublisher>();
+                        return new SalesFileAnalyzer(logger, configuration, dbProcessor, rabbit);
                     });
                 }).UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>(builder =>

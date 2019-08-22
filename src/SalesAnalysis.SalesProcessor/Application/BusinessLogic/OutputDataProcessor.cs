@@ -19,7 +19,7 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 
         private OutputDataDto _outputData;
 
-        public OutputDataProcessor(ILogger<OutputDataProcessor> logger, IRabbitMqClientPublisher clientPublisher, IConfiguration configuration,SalesProcessorDbContext context)
+        public OutputDataProcessor(ILogger<OutputDataProcessor> logger, IRabbitMqClientPublisher clientPublisher, IConfiguration configuration, SalesProcessorDbContext context)
         {
             _logger = logger;
             _clientPublisher = clientPublisher;
@@ -37,7 +37,12 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
                     .GetIdFromMostExpensiveSale(fileContent, _context)
                     .GetWorstSalesman(fileContent);
 
-                await _clientPublisher.PublishAsync(_configuration, _outputData);
+                await _clientPublisher.PublishAsync(_outputData
+                , _configuration["RabbitMqHostName"]
+                , _configuration["RabbitMqUsername"]
+                , _configuration["RabbitMqPassword"]
+                ,int.Parse(_configuration["RabbitMqRetryCount"])
+                , _configuration["RabbitMqPublishQueueName"]);
             }
             catch (Exception exception)
             {
@@ -46,11 +51,6 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
                 _logger.LogTrace(exception.Message);
             }
 
-        }
-
-        public async Task SendOutputData()
-        {
-            await _clientPublisher.PublishAsync(_configuration, _outputData);
         }
     }
 }

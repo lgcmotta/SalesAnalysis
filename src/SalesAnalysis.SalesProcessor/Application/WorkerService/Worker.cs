@@ -34,7 +34,11 @@ namespace SalesAnalysis.SalesProcessor.Application.WorkerService
 
             _clientReceiver = createScope.ServiceProvider.GetRequiredService<IRabbitMqClientReceiver>();
             _salesFileAnalyser = createScope.ServiceProvider.GetRequiredService<ISalesFileAnalyser>();
-            await _clientReceiver.ConfigureChannel();
+            await _clientReceiver.ConfigureChannel(_configuration["RabbitMqHostName"]
+            , _configuration["RabbitMqUsername"]
+            , _configuration["RabbitMqPassword"]
+            , int.Parse(_configuration["RabbitMqRetryCount"])
+            , _configuration["RabbitMqReceiveQueueName"]);
 
             _clientReceiver.Receive += RabbitMqClientOnRecieve;
         }

@@ -19,35 +19,37 @@ namespace SalesAnalysis.RabbitMQ.Implementations
             _logger = logger;
         }
         
-        public async Task PublishAsync(IConfiguration configuration, object file)
+        public async Task PublishAsync(object file, string hostName, string username, string password, int retryCount, string queueName)
         {
             lock (_syncroot)
             {
-                var retryCount = int.Parse(configuration["RabbitMqRetryCount"]);
+                _logger.LogInformation("RabbitMQ is trying to connect.");
 
                 var policy = PolicyHelper.CreateRabbitMqPolicy(_logger,retryCount);
 
                 policy.Execute(() =>
                 {
-                    var factory = RabbitMqHelper.CreateConnectionFactory(configuration);
+                    var factory = RabbitMqHelper.CreateConnectionFactory(hostName,username,password);
 
                     using var connection = factory.CreateConnection();
 
                     using var channel = connection.CreateModel();
 
-                    channel.QueueDeclare(configuration["RabbitMqQueueName"]
+                    channel.QueueDeclare(queueName
                         , false
                         , false
                         , false
                         , null);
 
-                    //var body = Encoding.GetEncoding("iso-8859-1").GetBytes(JsonConvert.SerializeObject(file));
                     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(file));
 
                     channel.BasicPublish(""
-                        , configuration["RabbitMqQueueName"]
+                        , queueName
                         , null
                         , body);
+
+                    _logger.LogInformation("RabbitMQ client is ready do publish messages.");
+
                 });
             }
         }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SalesAnalysis.FileWatcher.Application.BusinessLogic;
 using SalesAnalysis.FileWatcher.Application.WorkerService;
 using SalesAnalysis.FileWatcher.Core.Interfaces;
@@ -46,8 +47,18 @@ namespace SalesAnalysis.FileWatcher
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
-                    services.AddScoped<IFolderScanner, FolderScanner>();
-                    services.AddScoped<IRabbitMqClientPublisher, RabbitMqClientPublisher>();
+                    services.AddSingleton<IRabbitMqClientPublisher>(x =>
+                    {
+                        var logger = x.GetRequiredService<ILogger<RabbitMqClientPublisher>>();
+                        return new RabbitMqClientPublisher(logger);
+                    });
+                    services.AddSingleton<IFolderScanner>(x =>
+                    {
+                        var logger = x.GetRequiredService<ILogger<FolderScanner>>();
+                        var context = x.GetRequiredService<FileWatcherDbContext>();
+                        var rabbit = x.GetRequiredService<IRabbitMqClientPublisher>();
+                        return new FolderScanner(logger, configuration, rabbit, context);
+                    });
                     services.AddEntityFrameworkSqlServer()
                         .AddDbContext<FileWatcherDbContext>(options =>
                         {

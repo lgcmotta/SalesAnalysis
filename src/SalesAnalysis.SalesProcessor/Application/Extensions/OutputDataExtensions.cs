@@ -32,7 +32,7 @@ namespace SalesAnalysis.SalesProcessor.Application.Extensions
             sales.ForEach(s =>
             {
                 var price = s.SalesInfo.Sum(saleInfo => saleInfo.ItemPrice);
-                results.Add(Tuple.Create(s.Id, price));
+                results.Add(Tuple.Create(s.SaleId, price));
             });
 
             results = results.OrderByDescending(x => x.Item2).ToList();

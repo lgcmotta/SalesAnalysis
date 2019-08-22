@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesAnalysis.SalesProcesso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesAnalysis.RabbitMQ", "src\SalesAnalysis.RabbitMQ\SalesAnalysis.RabbitMQ.csproj", "{842BE749-3850-46C0-9BBD-60B21A42F25B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesAnalysis.FileWriter", "src\SalesAnalysis.FileWriter\SalesAnalysis.FileWriter.csproj", "{9D2C0246-1BFF-4A57-A661-6CC4E1A96619}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{842BE749-3850-46C0-9BBD-60B21A42F25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{842BE749-3850-46C0-9BBD-60B21A42F25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{842BE749-3850-46C0-9BBD-60B21A42F25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2C0246-1BFF-4A57-A661-6CC4E1A96619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D2C0246-1BFF-4A57-A661-6CC4E1A96619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D2C0246-1BFF-4A57-A661-6CC4E1A96619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D2C0246-1BFF-4A57-A661-6CC4E1A96619}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{82AB386A-0C7A-4E74-B1EA-CF8446962D90} = {DDB887FB-918A-44DE-BA93-2C40ED1FC378}
 		{D2041734-9F6A-48B9-8481-116DABD1E6F0} = {7DA5810E-18A0-4AD2-B6D7-D9FBF54DCC6E}
 		{842BE749-3850-46C0-9BBD-60B21A42F25B} = {DDB887FB-918A-44DE-BA93-2C40ED1FC378}
+		{9D2C0246-1BFF-4A57-A661-6CC4E1A96619} = {A564F915-B828-47C6-9C05-A29B9D95A186}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AA3445B3-3617-469A-ADC5-63598FA4B02C}

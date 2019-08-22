@@ -5,6 +5,7 @@ namespace SalesAnalysis.RabbitMQ.Interfaces
 {
     public interface IRabbitMqClientPublisher
     {
-        Task PublishAsync(IConfiguration configuration, object file);
+        Task PublishAsync(object file, string hostName, string username, string password
+            , int retryCount, string queueName);
     }
 }
