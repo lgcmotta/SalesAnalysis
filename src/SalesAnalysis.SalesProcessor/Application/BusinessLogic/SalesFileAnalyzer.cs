@@ -28,7 +28,7 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             _publisher = publisher;
         }
 
-        public async Task ProcessInputFile(InputFile inputFile)
+        public void ProcessInputFile(InputFile inputFile)
         {
             try
             {
@@ -37,11 +37,11 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
                 if (VerifyFileExistence(inputFile, fullPath))
                     return;
 
-                var fileContent = await File.ReadAllLinesAsync(fullPath, CancellationToken.None);
+                var fileContent = File.ReadAllLines(fullPath);
 
                 if (fileContent == null || fileContent.Length == 0)
                 {
-                    await ProcessFileFailed(inputFile);
+                    ProcessFileFailed(inputFile);
                     return;
                 }
                 
@@ -65,11 +65,11 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
                     && !contentDto.Sales.Any()
                     && !contentDto.Salesmen.Any())
                 {
-                    await ProcessFileFailed(inputFile);
+                    ProcessFileFailed(inputFile);
                     return;
                 }
 
-                await _salesDataProcessor.SaveContentToDatabase(contentDto);
+                    _salesDataProcessor.SaveContentToDatabase(contentDto);
 
             }
             catch (Exception exception)
@@ -80,18 +80,18 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             }
         }
 
-        private async Task ProcessFileFailed(InputFile inputFile)
+        private void ProcessFileFailed(InputFile inputFile)
         {
             _logger.LogCritical("{FileName} couldn't be processed.", inputFile.FileName);
 
-            await _publisher.PublishAsync(inputFile
+             _publisher.Publish(inputFile
                 , _configuration["RabbitMqHostnName"]
-                , _configuration["RabbitMqUserName"]
+                , _configuration["RabbitMqUsername"]
                 , _configuration["RabbitMqPassword"]
                 , int.Parse(_configuration["RabbitMqRetryCount"])
                 , _configuration["RabbitMqFailedQueueName"]);
 
-            return;
+            
         }
 
         private void AddCustomer(string line, FileContentDto viewModel)

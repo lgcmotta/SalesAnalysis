@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using SalesAnalysis.RabbitMQ.EventArgs;
+using RabbitMQ.Client;
 
 namespace SalesAnalysis.RabbitMQ.Interfaces
 {
     public interface IRabbitMqClientReceiver
     {
-        Task ConfigureChannel(string hostName, string username, string password
+        IModel Channel { get; set; }
+
+        void  ConfigureChannel(string hostName, string username, string password
             , int retryCount, string queueName);
 
         event EventHandler Receive;

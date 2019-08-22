@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -19,7 +18,7 @@ namespace SalesAnalysis.RabbitMQ.Implementations
             _logger = logger;
         }
         
-        public async Task PublishAsync(object file, string hostName, string username, string password, int retryCount, string queueName)
+        public void Publish(object file, string hostName, string username, string password, int retryCount, string queueName)
         {
             lock (_syncroot)
             {
@@ -35,17 +34,21 @@ namespace SalesAnalysis.RabbitMQ.Implementations
 
                     using var channel = connection.CreateModel();
 
-                    channel.QueueDeclare(queueName
-                        , false
-                        , false
-                        , false
-                        , null);
+                    channel.QueueDeclare(queue: queueName,
+                        durable: false,
+                        exclusive: false,
+                        autoDelete: false,
+                        arguments: null);
 
                     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(file));
 
+                    var properties = channel.CreateBasicProperties();
+
+                    properties.Persistent = true;
+
                     channel.BasicPublish(""
-                        , queueName
-                        , null
+                        ,queueName
+                        , properties
                         , body);
 
                     _logger.LogInformation("RabbitMQ client is ready do publish messages.");

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SalesAnalysis.RabbitMQ.Helpers;
-using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.SalesProcessor.Application.DTO;
 using SalesAnalysis.SalesProcessor.Core.Domain;
 using SalesAnalysis.SalesProcessor.Core.Interfaces;
@@ -25,44 +25,43 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             _processor = processor;
         }
 
-        public async Task SaveContentToDatabase(FileContentDto content)
+        public void SaveContentToDatabase(FileContentDto content)
         {
-
-            var policy = PolicyHelper.CreateSqlPolicy(_logger, 5);
-
-            await policy.Execute(async () =>
+            try
             {
-                await AddOrUpdateFile(content.InputFile);
+                AddOrUpdateFile(content.InputFile);
 
-                await AddOrUpdateSalesman(content.Salesmen);
+                AddOrUpdateSalesman(content.Salesmen);
 
-                await AddOrUpdateCustomer(content.Customers);
+                AddOrUpdateCustomer(content.Customers);
 
-                await AddOrUpdateSales(content.Sales, content.InputFile.FileName);
+                AddOrUpdateSales(content.Sales, content.InputFile.FileName);
 
-                var saved = await _context.SaveAsync();
+                var saved =  _context.SaveChanges();
 
                 if (saved > 0)
-                    _processor.BuildOutputData(content).GetAwaiter();
-          
-            });
+                    _processor.BuildOutputData(content);
 
-            //_logger.LogError("An unexpected exception occurred while processing view model data.");
-            //_logger.LogError("Exceptiom {message}", exception.Message);
-            //_logger.LogTrace(exception.StackTrace);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError("An unexpected exception occurred while processing view model data.");
+                _logger.LogError("Exceptiom {message}", exception.Message);
+                _logger.LogTrace(exception.StackTrace);
+            }
         }
 
-        private async Task AddOrUpdateSales(List<Sale> sales, string inputFileFileName)
+        private void AddOrUpdateSales(List<Sale> sales, string inputFileFileName)
         {
-            sales.ForEach(async sale =>
+            sales.ForEach(sale =>
             {
-                var fromDb = await _context.Sales.SingleOrDefaultAsync(s => s.SaleId == sale.SaleId);
+                var fromDb =  _context.Sales.SingleOrDefault(s => s.SaleId == sale.SaleId);
 
                 if (fromDb == null)
                 {
                     sale.InputFileName = inputFileFileName;
-                    await _context.Sales.AddAsync(sale);
-                    await _context.SalesInfo.AddRangeAsync(sale.SalesInfo);
+                     _context.Sales.Add(sale);
+                     _context.SalesInfo.AddRange(sale.SalesInfo);
 
                 }
                 else
@@ -76,14 +75,14 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             });
         }
 
-        private async Task AddOrUpdateCustomer(List<Customer> customers)
+        private void AddOrUpdateCustomer(List<Customer> customers)
         {
-            customers.ForEach(async customer =>
+            customers.ForEach(customer =>
             {
-                var fromDb = await _context.Customers.SingleOrDefaultAsync(c => c.Name == customer.Name
+                var fromDb =  _context.Customers.SingleOrDefault(c => c.Name == customer.Name
                                                                                 && c.Cnpj == customer.Cnpj);
                 if (fromDb == null)
-                    await _context.Customers.AddAsync(customer);
+                     _context.Customers.Add(customer);
                 else
                 {
                     fromDb.Name = customer.Name;
@@ -95,11 +94,11 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             });
         }
 
-        private async Task AddOrUpdateSalesman(List<Salesman> salesmen)
+        private void AddOrUpdateSalesman(List<Salesman> salesmen)
         {
             salesmen.ForEach(async sm =>
             {
-                var fromDb = await _context.Salesmen.SingleOrDefaultAsync(s => s.Name == sm.Name
+                var fromDb = _context.Salesmen.SingleOrDefault(s => s.Name == sm.Name
                                                                                && s.Cpf == sm.Cpf);
                 if (fromDb == null)
                 {
@@ -116,9 +115,9 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             
         }
 
-        private async Task AddOrUpdateFile(InputFile inputFile)
+        private void AddOrUpdateFile(InputFile inputFile)
         {
-            var fromDb = await _context.InputFiles.SingleOrDefaultAsync(f => f.FileName == inputFile.FileName
+            var fromDb = _context.InputFiles.SingleOrDefault(f => f.FileName == inputFile.FileName
                                                                            && f.FileExtension == inputFile.FileExtension
                                                                            && f.Processed);
             if (fromDb != null)
@@ -130,7 +129,7 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
 
             inputFile.Id = null;
 
-            await _context.AddAsync(inputFile);
+            _context.Add(inputFile);
 
         }
     }

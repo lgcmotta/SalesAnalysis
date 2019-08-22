@@ -6,16 +6,16 @@ namespace SalesAnalysis.SalesProcessor.Infrastructure.Migrations
 {
     public class MigrateDbContext
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         public MigrateDbContext(IServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider;
         }
 
-        public void PerformDbContextMigration()
+        public void MigrateContext()
         {
-            using var serviceScope = this.serviceProvider.GetService<IServiceScopeFactory>().CreateScope();
+            using var serviceScope = _serviceProvider.GetService<IServiceScopeFactory>().CreateScope();
             var context = serviceScope.ServiceProvider.GetRequiredService<SalesProcessorDbContext>();
             context.Database.EnsureCreated();
         }

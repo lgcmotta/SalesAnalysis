@@ -5,6 +5,6 @@ namespace SalesAnalysis.SalesProcessor.Core.Interfaces
 {
     public interface ISalesDataProcessor
     {
-        Task SaveContentToDatabase(FileContentDto content);
+        void SaveContentToDatabase(FileContentDto content);
     }
 }

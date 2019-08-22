@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using SalesAnalysis.RabbitMQ.EventArgs;
 using SalesAnalysis.RabbitMQ.Helpers;
 using SalesAnalysis.RabbitMQ.Interfaces;
 
@@ -17,8 +14,8 @@ namespace SalesAnalysis.RabbitMQ.Implementations
 
         private ConnectionFactory _connectionFactory;
         private IConnection _connection;
-        private IModel _channel;
         private EventingBasicConsumer _consumer;
+        private IModel _channel;
 
         public event EventHandler Receive;
 
@@ -27,7 +24,13 @@ namespace SalesAnalysis.RabbitMQ.Implementations
             _logger = logger;
         }
 
-        public async Task ConfigureChannel(string hostName, string username, string password, int retryCount, string queueName)
+        public IModel Channel
+        {
+            get => _channel;
+            set => _channel = value;
+        }
+
+        public void ConfigureChannel(string hostName, string username, string password, int retryCount, string queueName)
         {
             _logger.LogInformation("RabbitMQ is trying to connect");
 
@@ -35,12 +38,15 @@ namespace SalesAnalysis.RabbitMQ.Implementations
 
             policy.Execute(() =>
             {
-                _connectionFactory = RabbitMqHelper.CreateConnectionFactory(hostName, username, password);
+                _connectionFactory = new ConnectionFactory()
+                {
+                    HostName = hostName, UserName = username, Password = password
+                };
 
                 _connection = _connectionFactory.CreateConnection();
 
                 _channel = _connection.CreateModel();
-
+                
                 _channel.QueueDeclare(queueName
                     , false
                     , false
@@ -51,9 +57,10 @@ namespace SalesAnalysis.RabbitMQ.Implementations
 
                 _consumer.Received += OnConsumerOnReceived;
 
-                _channel.BasicConsume(queueName, true, _consumer);
+                _channel.BasicConsume(queueName, false, _consumer);
 
                 _logger.LogInformation("RabbitMQ Client is ready to receive messages");
+
             });
         }
 

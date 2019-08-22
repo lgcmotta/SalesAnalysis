@@ -4,7 +4,7 @@ using System.Linq;
 using SalesAnalysis.SalesProcessor.Application.DTO;
 using SalesAnalysis.SalesProcessor.Infrastructure.Persistence;
 
-namespace SalesAnalysis.SalesProcessor.Application.Extensions
+namespace SalesAnalysis.SalesProcessor.Infrastructure.Extensions
 {
     public static class OutputDataExtensions
     {
@@ -26,11 +26,12 @@ namespace SalesAnalysis.SalesProcessor.Application.Extensions
             , SalesProcessorDbContext context)
         {
             var sales = context.Sales.Where(s => s.InputFileName == contentDto.InputFile.FileName).ToList();
-
+            
             var results = new List<Tuple<int, float>>();
 
             sales.ForEach(s =>
             {
+                s.SalesInfo = context.SalesInfo.Where(info => info.FkSale == s.Id).ToList();
                 var price = s.SalesInfo.Sum(saleInfo => saleInfo.ItemPrice);
                 results.Add(Tuple.Create(s.SaleId, price));
             });

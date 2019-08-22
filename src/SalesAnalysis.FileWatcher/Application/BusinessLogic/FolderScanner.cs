@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SalesAnalysis.FileWatcher.Core.Domain;
 using SalesAnalysis.FileWatcher.Core.Interfaces;
@@ -33,18 +32,18 @@ namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
             _folderPath = configuration["InputFolder"];
         }
 
-        public async Task StartFolderScanAsync()
+        public void StartFolderScanAsync()
         {
             var policy = PolicyHelper.CreateSqlPolicy(_logger, 3);
 
-            await policy.Execute(ScanFolder);
+            policy.Execute(ScanFolder);
         }
 
-        private async Task ScanFolder()
+        private void ScanFolder()
         {
             var extensions = GetExtensions();
 
-            var files = await _context.InputFiles.ToListAsync();
+            var files =  _context.InputFiles.ToList();
 
             var filesInFolder = new DirectoryInfo(_folderPath).GetFiles();
 
@@ -60,9 +59,9 @@ namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
 
                 var file = CreateInputFileEntity(fileInfo);
 
-                await _context.InputFiles.AddAsync(file);
+                 _context.InputFiles.Add(file);
 
-                await _publisher.PublishAsync(file
+                 _publisher.Publish(file
                     , _configuration["RabbitMqHostName"]
                     , _configuration["RabbitMqUsername"]
                     , _configuration["RabbitMqPassword"]
@@ -70,7 +69,7 @@ namespace SalesAnalysis.FileWatcher.Application.BusinessLogic
                     ,_configuration["RabbitMqPublishQueueName"]);
             }
 
-            var saved = await _context.SaveAsync();
+            var saved =  _context.SaveAsync();
         }
 
         private List<string> GetExtensions() => _configuration.GetSection("ExtensionsToScan").GetChildren().Select(x => x.Value).ToList();

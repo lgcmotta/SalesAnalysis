@@ -1,0 +1,8 @@
+﻿--------- Original Input File: {InputFile}
+
+--------- Salesmen Count: {SalesmenCount}
+--------- Customers Count: {CustomersCount}
+--------- Most Expensive Sale Id: {MEId}
+--------- Worst Salesman: {WorstSalesman}
+
+--------- Output Generated At: {GeneratedAt}

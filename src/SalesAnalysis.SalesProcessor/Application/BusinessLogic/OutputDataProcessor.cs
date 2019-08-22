@@ -4,8 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SalesAnalysis.RabbitMQ.Interfaces;
 using SalesAnalysis.SalesProcessor.Application.DTO;
-using SalesAnalysis.SalesProcessor.Application.Extensions;
 using SalesAnalysis.SalesProcessor.Core.Interfaces;
+using SalesAnalysis.SalesProcessor.Infrastructure.Extensions;
 using SalesAnalysis.SalesProcessor.Infrastructure.Persistence;
 
 namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
@@ -27,22 +27,28 @@ namespace SalesAnalysis.SalesProcessor.Application.BusinessLogic
             _context = context;
         }
 
-        public async Task BuildOutputData(FileContentDto fileContent)
+        public void BuildOutputData(FileContentDto fileContent)
         {
             try
             {
-                _outputData = new OutputDataDto()
-                    .GetCustomersQuantity(fileContent)
-                    .GetSalesmenQuantity(fileContent)
-                    .GetIdFromMostExpensiveSale(fileContent, _context)
-                    .GetWorstSalesman(fileContent);
+                _outputData = new OutputDataDto
+                {
+                    FileName = fileContent.InputFile.FileName
+                    , FileExtension = fileContent.InputFile.FileExtension
+                    , GenerationDate = DateTime.Now
+                }
+                .GetCustomersQuantity(fileContent)
+                .GetSalesmenQuantity(fileContent)
+                .GetIdFromMostExpensiveSale(fileContent
+                    , _context)
+                .GetWorstSalesman(fileContent);
 
-                await _clientPublisher.PublishAsync(_outputData
-                , _configuration["RabbitMqHostName"]
-                , _configuration["RabbitMqUsername"]
-                , _configuration["RabbitMqPassword"]
-                ,int.Parse(_configuration["RabbitMqRetryCount"])
-                , _configuration["RabbitMqPublishQueueName"]);
+                 _clientPublisher.Publish(_outputData
+                    , _configuration["RabbitMqHostName"]
+                    , _configuration["RabbitMqUsername"]
+                    , _configuration["RabbitMqPassword"]
+                    ,int.Parse(_configuration["RabbitMqRetryCount"])
+                    , _configuration["RabbitMqPublishQueueName"]);
             }
             catch (Exception exception)
             {

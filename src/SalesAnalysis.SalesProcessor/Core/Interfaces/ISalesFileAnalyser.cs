@@ -5,6 +5,6 @@ namespace SalesAnalysis.SalesProcessor.Core.Interfaces
 {
     public interface ISalesFileAnalyser
     {
-        Task ProcessInputFile(InputFile inputFile);
+        void ProcessInputFile(InputFile inputFile);
     }
 }

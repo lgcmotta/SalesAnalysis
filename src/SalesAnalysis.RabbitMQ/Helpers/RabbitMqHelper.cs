@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace SalesAnalysis.RabbitMQ.Helpers
 {

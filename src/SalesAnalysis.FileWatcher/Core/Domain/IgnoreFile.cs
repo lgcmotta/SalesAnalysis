@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SalesAnalysis.FileWatcher.Core.Domain
+﻿namespace SalesAnalysis.FileWatcher.Core.Domain
 {
     public class IgnoreFile
     {
