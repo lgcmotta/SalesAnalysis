@@ -41,6 +41,6 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if not exist &quot;C:\HOMEPATH\data\in&quot; mkdir &quot;C:\HOMEPATH\data\in&quot;" />
+    <Exec Command="if not exist &quot;C:\HOMEPATH\data\templateFiles&quot; mkdir &quot;C:\HOMEPATH\data\templateFiles&quot;&#xD;&#xA;if not exist &quot;C:\HOMEPATH\data\out&quot; mkdir &quot;C:\HOMEPATH\data\out&quot;&#xD;&#xA;if not exist &quot;C:\HOMEPATH\data\in&quot; mkdir &quot;C:\HOMEPATH\data\in&quot;" />
   </Target>
 </Project>

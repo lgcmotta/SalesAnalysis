@@ -36,6 +36,6 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if not exist &quot;C:\HOMEPATH\data\out&quot; mkdir &quot;C:\HOMEPATH\data\out&quot;&#xD;&#xA;if not exist &quot;C:\HOMEPATH\data\templateFiles&quot; mkdir &quot;C:\HOMEPATH\data\templateFiles&quot;&#xD;&#xA;copy &quot;$(OutDir)TemplateFiles\OutputTemplate.txt&quot; &quot;C:\HOMEPATH\data\templateFiles&quot;" />
+    <Exec Command="if not exist &quot;C:\HOMEPATH\data\templateFiles\OutputTemplate.txt&quot; copy &quot;$(OutDir)TemplateFiles\OutputTemplate.txt&quot; &quot;C:\HOMEPATH\data\templateFiles&quot;" />
   </Target>
 </Project>
